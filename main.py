@@ -84,12 +84,26 @@ async def search_user(message: types.Message):
 async def handle_username(message: types.Message):
     username = message.text[1:]  # Remove the '@' character
     try:
-        async with client:
-            user = await client.get_entity(username)
-            user_info = f"User ID: {user.id}\nUsername: @{user.username}\nFull Name: {user.first_name} {user.last_name or ''}"
-            await message.reply(user_info)
+        await client.start()  # Ensure the client is running
+        user = await client.get_entity(username)  # Search for the user entity
+        
+        # Prepare the user info message
+        user_info = (
+            f"ID: {user.id}\n"
+            f"Username: @{user.username}\n"
+            f"Name: {user.first_name} {user.last_name or ''}\n"
+            f"Bot: {'Yes' if user.bot else 'No'}"
+        )
+        await message.reply(user_info)  # Reply with user info
+
+    except UsernameInvalidError:
+        await message.reply("Invalid username. Please check and try again.")
+    except UsernameNotOccupiedError:
+        await message.reply(f"The username '{username}' does not exist.")
     except Exception as e:
-        await message.reply("User not found. Please check the username and try again.")
+        await message.reply(f"Error: {e}")
+    finally:
+        await client.disconnect()  # Safely disconnect after search
 
 @dp.message_handler()
 async def answer_question(message: types.Message):
