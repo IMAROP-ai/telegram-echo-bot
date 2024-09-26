@@ -15,6 +15,10 @@ dp = Dispatcher(bot)
 
 client = TelegramClient('anon', API_ID, API_HASH)
 
+# Start the Telethon client asynchronously
+async def on_startup(dp):
+    await client.start()
+
 # Global variables
 current_question = None
 current_game = None
@@ -84,14 +88,9 @@ async def search_user(message: types.Message):
 async def handle_username(message: types.Message):
     username = message.text  # Remove the '@' character
     try:
-        async with client:
-            # Ensure Telethon client is started
-            if not client.is_connected():
-                await client.connect()
-
-            user = await client.get_entity(username)
-            user_info = f"User ID: {user.id}\nUsername: @{user.username}\nFull Name: {user.first_name} {user.last_name or ''}"
-            await message.reply(user_info)
+        user = await client.get_entity(username)
+        user_info = f"User ID: {user.id}\nUsername: @{user.username}\nFull Name: {user.first_name} {user.last_name or ''}"
+        await message.reply(user_info)
     except Exception as e:
         await message.reply(f"User not found or error occurred: {e}")
 
@@ -119,4 +118,4 @@ async def answer_question(message: types.Message):
         await message.reply("Use the menu to select a game.")
 
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
