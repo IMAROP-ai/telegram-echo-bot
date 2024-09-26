@@ -110,28 +110,44 @@ async def play_hangman(message: types.Message, word: str, hidden_word: list, att
             msg = await message.reply(f"Incorrect! You have {attempts} attempts left.\n" + " ".join(hidden_word))
             dp.register_message_handler(lambda m: play_hangman(m, word, hidden_word, attempts), lambda m: True)
 
-# Math Challenge game
-async def start_math_challenge(message: types.Message):
+# Math Challenge Game
+def start_math_challenge(message):
+    user_id = message.from_user.id
+
     num1 = random.randint(1, 10)
     num2 = random.randint(1, 10)
     operator = random.choice(['+', '-', '*'])
-    correct_answer = eval(f"{num1} {operator} {num2}")
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton("Restart Math Challenge", callback_data="math_challenge"))
-    msg = await message.reply(f"🔢 Solve this: {num1} {operator} {num2} = ?", reply_markup=markup)
-    dp.register_message_handler(lambda m: check_math_answer(m, correct_answer), lambda m: True)
+    
+    if operator == '+':
+        correct_answer = num1 + num2
+    elif operator == '-':
+        correct_answer = num1 - num2
+    elif operator == '*':
+        correct_answer = num1 * num2
+    
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("Restart Math Challenge", callback_data="math_challenge"))
 
-async def check_math_answer(message: types.Message, correct_answer: int):
+    msg = bot.reply_to(message, f"🔢 Solve this: {num1} {operator} {num2} = ?", reply_markup=markup)
+    bot.register_next_step_handler(msg, check_math_answer, correct_answer)
+
+def check_math_answer(message, correct_answer):
+    user_id = message.from_user.id
+
+    if current_games.get(user_id) != "math_challenge":
+        return
+
     try:
         user_answer = int(message.text)
-        markup = InlineKeyboardMarkup()
-        markup.add(InlineKeyboardButton("Restart Math Challenge", callback_data="math_challenge"))
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton("Restart Math Challenge", callback_data="math_challenge"))
+        
         if user_answer == correct_answer:
-            await message.reply("🎉 Correct! Well done!", reply_markup=markup)
+            bot.reply_to(message, "🎉 Correct! Well done!", reply_markup=markup)
         else:
-            await message.reply(f"❌ Incorrect! The correct answer was {correct_answer}. Try again.", reply_markup=markup)
+            bot.reply_to(message, f"❌ Incorrect! The correct answer was {correct_answer}. Try again.", reply_markup=markup)
     except ValueError:
-        await message.reply("Please enter a valid number.")
+        bot.reply_to(message, "Please enter a valid number.")
 
 # Start polling
 if __name__ == '__main__':
