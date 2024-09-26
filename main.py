@@ -1,37 +1,30 @@
-from aiogram import Bot, Dispatcher, executor, types
 import os
-from keep_alive import keep_alive
-keep_alive()
-
-bot = Bot(token=os.environ.get('token'))
-dp = Dispatcher(bot)
-
-import telebot
 import random
+import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from keep_alive import keep_alive  # Import the keep_alive function
 
-# Hardcoded API token
-API_TOKEN = '7185464054:AAFaWfvQfpYxDZMagAmAQfalE83xu85suhg'  # Your bot token
+# Keep the bot alive
+keep_alive()
+
+# Use environment variable for token
+API_TOKEN = os.environ.get('token')  # Your bot token
 bot = telebot.TeleBot(API_TOKEN)
 
 current_games = {}
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "👋 Welcome! I can provide you with information about your Telegram account, /info Click here to know the information about your account. You can even play games with the bot, /games click here to play games")
+    bot.reply_to(message, "👋 Welcome! I can provide you with information about your Telegram account, /info Click here to know the information about your account. You can even play games with the bot, /games click here to play games.")
 
 # Info command
 @bot.message_handler(commands=['info'])
 def send_info(message):
     user = message.from_user
-    
-
     info = (
         "🆔 *Here is your account information* ℹ️ 😙\n\n"
         f"👤 *Username*: @{user.username or 'N/A'}\n"
         f"📛 *Full Name*: {user.first_name} {user.last_name or ''}\n"
-        
         f"🔑 *Telegram ID*: `{user.id}`\n\n"
         "For promotion or any issues - [@Imarop](https://t.me/imarop)"
     )
@@ -66,17 +59,11 @@ def handle_game_selection(call):
         start_math_challenge(call.message)
 
 def start_guess_game(message):
-    user_id = message.from_user.id
     number = random.randint(1, 10)
     msg = bot.reply_to(message, "🎲 I'm thinking of a number between 1 and 10. Can you guess it?")
     bot.register_next_step_handler(msg, check_guess, number)
 
 def check_guess(message, number):
-    user_id = message.from_user.id
-
-    if current_games.get(user_id) != "guess_number":
-        return
-
     try:
         guess = int(message.text)
         markup = InlineKeyboardMarkup()
@@ -89,7 +76,6 @@ def check_guess(message, number):
         bot.reply_to(message, "Please send a number between 1 and 10.")
 
 def start_hangman(message):
-    user_id = message.from_user.id
     word = random.choice(["python", "telegram", "bot", "hangman", "game"])
     hidden_word = ["_" for _ in word]
     attempts = 6
@@ -101,11 +87,6 @@ def start_hangman(message):
     bot.register_next_step_handler(msg, play_hangman, word, hidden_word, attempts)
 
 def play_hangman(message, word, hidden_word, attempts):
-    user_id = message.from_user.id
-
-    if current_games.get(user_id) != "hangman":
-        return
-
     guess = message.text.lower()
 
     if len(guess) != 1 or not guess.isalpha():
@@ -135,7 +116,6 @@ def play_hangman(message, word, hidden_word, attempts):
             bot.register_next_step_handler(msg, play_hangman, word, hidden_word, attempts)
 
 def start_math_challenge(message):
-    user_id = message.from_user.id
     num1 = random.randint(1, 10)
     num2 = random.randint(1, 10)
     operator = random.choice(['+', '-', '*'])
@@ -154,11 +134,6 @@ def start_math_challenge(message):
     bot.register_next_step_handler(msg, check_math_answer, correct_answer)
 
 def check_math_answer(message, correct_answer):
-    user_id = message.from_user.id
-
-    if current_games.get(user_id) != "math_challenge":
-        return
-
     try:
         user_answer = int(message.text)
         markup = InlineKeyboardMarkup()
@@ -170,19 +145,8 @@ def check_math_answer(message, correct_answer):
     except ValueError:
         bot.reply_to(message, "Please enter a valid number.")
 
-# Keep the bot alive
-keep_alive()
-
-# Error handler to prevent crashes
-def handle_error(e):
-    print(f"Error occurred: {e}")
-
 # Run the bot
 try:
-    bot.polling(none_stop=True, interval=0)
+    bot.polling(none_stop=True)
 except Exception as e:
-    handle_error(e)
-
-
-if __name__ == '__main__':
-    executor.start_polling(dp)
+    print(f"Error occurred: {e}")
