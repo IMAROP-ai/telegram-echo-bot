@@ -26,7 +26,7 @@ def send_info(message):
         f"👤 *Username*: @{user.username or 'N/A'}\n"
         f"📛 *Full Name*: {user.first_name} {user.last_name or ''}\n"
         f"🔑 *Telegram ID*: `{user.id}`\n\n"
-        "For promotion or any issues - [@Imarop](https://t.me/imarop)"
+        
     )
     bot.reply_to(message, info, parse_mode='Markdown')
 
