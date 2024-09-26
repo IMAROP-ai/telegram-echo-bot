@@ -26,6 +26,7 @@ def send_info(message):
         f"👤 *Username*: @{user.username or 'N/A'}\n"
         f"📛 *Full Name*: {user.first_name} {user.last_name or ''}\n"
         f"🔑 *Telegram ID*: `{user.id}`\n\n"
+        
     )
     bot.reply_to(message, info, parse_mode='Markdown')
 
@@ -143,14 +144,6 @@ def check_math_answer(message, correct_answer):
             bot.reply_to(message, f"❌ Incorrect! The correct answer was {correct_answer}. Try again.", reply_markup=markup)
     except ValueError:
         bot.reply_to(message, "Please enter a valid number.")
-
-# Refresh command
-@bot.message_handler(commands=['refresh'])
-def refresh_user(message):
-    user_id = message.from_user.id
-    if user_id in current_games:
-        del current_games[user_id]  # Remove any game data for the user
-    bot.reply_to(message, "🔄 Your session has been refreshed!")
 
 # Run the bot
 try:
