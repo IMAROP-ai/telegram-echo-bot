@@ -17,6 +17,8 @@ client = TelegramClient('anon', API_ID, API_HASH)
 
 # Global variables
 current_question = None
+current_game = None
+word_list = ["python", "telegram", "bot", "hangman", "game"]  # Words for guessing game
 
 def generate_question():
     """Generate a simple math question and return the question string and answer."""
@@ -49,11 +51,21 @@ async def games_menu(message: types.Message):
     markup.add(KeyboardButton("🔙 Back"))
     await message.reply("Select a game to play:", reply_markup=markup)
 
+@dp.message_handler(lambda message: message.text == "🔙 Back")
+async def back_to_main_menu(message: types.Message):
+    await welcome(message)
+
 @dp.message_handler(lambda message: message.text == "Math Quiz")
 async def quiz(message: types.Message):
     global current_question
     current_question = generate_question()
     await message.reply(current_question[0])
+
+@dp.message_handler(lambda message: message.text == "Word Guessing Game")
+async def word_guessing_game(message: types.Message):
+    global current_game
+    current_game = random.choice(word_list)
+    await message.reply("Guess the word! You have 3 attempts. Type your guess:")
 
 @dp.message_handler(lambda message: message.text == "🆔 My Info")
 async def user_info(message: types.Message):
@@ -82,6 +94,8 @@ async def handle_username(message: types.Message):
 @dp.message_handler()
 async def answer_question(message: types.Message):
     global current_question
+    global current_game
+
     if current_question:
         try:
             user_answer = int(message.text)
@@ -91,6 +105,12 @@ async def answer_question(message: types.Message):
                 await message.reply("Wrong answer! Try again or choose a game from the menu.")
         except ValueError:
             await message.reply("Please send a valid number as your answer.")
+    elif current_game:
+        if message.text.lower() == current_game:
+            await message.reply(f"🎉 Congratulations! You've guessed the word: {current_game}.")
+            current_game = None  # Reset current game
+        else:
+            await message.reply("❌ Incorrect! Try again.")
     else:
         await message.reply("Use the menu to select a game.")
 
