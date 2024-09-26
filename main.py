@@ -1,22 +1,20 @@
-from aiogram import Bot, Dispatcher, executor, types
 import os
 import telebot
 import random
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from keep_alive import keep_alive
-keep_alive()
+from keep_alive import keep_alive  # Import the keep_alive function
 
-bot = Bot(token=os.environ.get('token'))
-dp = Dispatcher(bot)
+keep_alive()  # Start the keep-alive server
 
-#The script from hwre offcourse 👽🗿
-
-
+bot = telebot.TeleBot(os.environ.get('token'))
 current_games = {}
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     bot.reply_to(message, "👋 Welcome! I can provide you with information about your Telegram account, /info Click here to know the information about your account. You can even play games with the bot, /games click here to play games")
+
+# (Rest of the bot logic remains unchanged)
+
 
 # Info command
 @bot.message_handler(commands=['info'])
@@ -176,4 +174,4 @@ def check_math_answer(message, correct_answer):
 
 
 if __name__ == '__main__':
-    executor.start_polling(dp)
+    bot.polling(none_stop=True)  # Start polling to receive updates
