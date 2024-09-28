@@ -153,8 +153,7 @@ fun_facts = [
 "Jellyfish have been around for over 600 million years.",
 "A single strand of spaghetti is called a 'spaghetto.'",
 "Octopuses are known to collect shiny objects and create collections in their dens.",
-"
-        "The longest hiccuping spree lasted for 68 years.",
+  "The longest hiccuping spree lasted for 68 years.",
 "Elephants are the only animals that can't jump.",
 "Most lipstick contains fish scales.",
 "Octopuses have three hearts.",
@@ -311,8 +310,8 @@ fun_facts = [
 "The unicorn is the national animal of Scotland.",
 "Beavers can hold their breath underwater for up to 15 minutes.",
 "Octopuses have blue blood because of a copper-based molecule called hemocyanin.",
-"The mantis shrimp has the fastest punch in the
-        "The shortest commercial flight in the world is just 57 seconds long, between two Scottish islands.",
+"This bot is made my @IMAROP 😎 !! "
+"The shortest commercial flight in the world is just 57 seconds long, between two Scottish islands.",
 "A group of flamingos is called a 'flamboyance.'",
 "An octopus has nine brains and three hearts.",
 "Sharks are the only fish that can blink with both eyes.",
