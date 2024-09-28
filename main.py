@@ -13,9 +13,20 @@ bot = telebot.TeleBot(API_TOKEN)
 
 current_games = {}
 
+# List of fun facts
+fun_facts = [
+    "Did you know that honey never spoils? Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3000 years old and still edible!",
+    "Bananas are berries, but strawberries aren't!",
+    "Octopuses have three hearts and blue blood!",
+    "A group of flamingos is called a 'flamboyance.'",
+    "Wombat poop is cube-shaped!"
+]
+
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "👋 Welcome! I can provide you with information about your Telegram account, /info Click here to know the information about your account. You can even play games with the bot, /games click here to play games.")
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton("Fun Fact", callback_data="fun_fact"))
+    bot.reply_to(message, "👋 Welcome! I can provide you with information about your Telegram account, /info Click here to know the information about your account. You can even play games with the bot, /games click here to play games.", reply_markup=markup)
 
 # Info command
 @bot.message_handler(commands=['info'])
@@ -57,6 +68,12 @@ def handle_game_selection(call):
     elif call.data == "math_challenge":
         current_games[user_id] = "math_challenge"
         start_math_challenge(call.message)
+    elif call.data == "fun_fact":
+        send_fun_fact(call.message)
+
+def send_fun_fact(message):
+    fact = random.choice(fun_facts)
+    bot.reply_to(message, fact)
 
 def start_guess_game(message):
     number = random.randint(1, 10)
