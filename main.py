@@ -15,48 +15,22 @@ current_games = {}
 
 # List of fun facts
 fun_facts = [
-    "Did you know that honey never spoils? Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3000 years old and still edible!",
-    "Bananas are berries, but strawberries aren't!",
-    "Octopuses have three hearts and blue blood!",
+    "Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3000 years old and still edible.",
+    "Octopuses have three hearts and blue blood.",
+    "Bananas are berries, but strawberries are not.",
     "A group of flamingos is called a 'flamboyance.'",
-    "Wombat poop is cube-shaped!"
+    "Wombat poop is cube-shaped.",
+    "There are more stars in the universe than grains of sand on all the Earth's beaches.",
+    "Cows have best friends and get stressed when they are separated.",
+    "A day on Venus is longer than a year on Venus."
 ]
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    user_name = message.from_user.first_name
-    welcome_message = f"👋 Hello, {user_name}! Welcome to the Bot!\n\n" \
-                      "Here you can:\n" \
-                      "1. Contact Support for help.\n" \
-                      "2. Get information about your Telegram account.\n" \
-                      "3. Play fun mini-games.\n\n" \
-                      "Choose an option below:"
-    
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton("Contact Support", url="https://t.me/imarop"))  # Replace with your Telegram ID
-    markup.add(InlineKeyboardButton("Info", callback_data="info"))
-    markup.add(InlineKeyboardButton("Games", callback_data="games"))
-    
-    bot.reply_to(message, welcome_message, reply_markup=markup)
+    bot.reply_to(message, "👋 Welcome! I can provide you with information about your Telegram account, /info Click here to know the information about your account. You can even play games with the bot, /games click here to play games.")
 
-@bot.callback_query_handler(func=lambda call: True)
-def handle_callback(call):
-    if call.data == "info":
-        send_info(call.message)
-    elif call.data == "games":
-        show_games(call.message)
-    elif call.data == "guess_number":
-        current_games[call.from_user.id] = "guess_number"
-        start_guess_game(call.message)
-    elif call.data == "hangman":
-        current_games[call.from_user.id] = "hangman"
-        start_hangman(call.message)
-    elif call.data == "math_challenge":
-        current_games[call.from_user.id] = "math_challenge"
-        start_math_challenge(call.message)
-    elif call.data == "fun_fact":
-        send_fun_fact(call.message)
-
+# Info command
+@bot.message_handler(commands=['info'])
 def send_info(message):
     user = message.from_user
     info = (
@@ -67,23 +41,40 @@ def send_info(message):
     )
     bot.reply_to(message, info, parse_mode='Markdown')
 
+@bot.message_handler(commands=['games'])
 def show_games(message):
     markup = InlineKeyboardMarkup()
     games = [
         ("🎲 Guess the Number", "guess_number"),
         ("🧠 Hangman", "hangman"),
         ("🔢 Math Challenge", "math_challenge"),
-        ("🧩 Fun Fact", "fun_fact")
+        ("📝 Fun Fact", "fun_fact"),  # Add FunFact button here
     ]
 
     for game_name, game_callback in games:
         markup.add(InlineKeyboardButton(game_name, callback_data=game_callback))
 
-    bot.reply_to(message, "Choose a mini-game to play or get a fun fact:", reply_markup=markup)
+    bot.reply_to(message, "Choose a mini-game to play:", reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: True)
+def handle_game_selection(call):
+    user_id = call.from_user.id
+
+    if call.data == "guess_number":
+        current_games[user_id] = "guess_number"
+        start_guess_game(call.message)
+    elif call.data == "hangman":
+        current_games[user_id] = "hangman"
+        start_hangman(call.message)
+    elif call.data == "math_challenge":
+        current_games[user_id] = "math_challenge"
+        start_math_challenge(call.message)
+    elif call.data == "fun_fact":
+        send_fun_fact(call.message)  # Handle FunFact selection
 
 def send_fun_fact(message):
-    fact = random.choice(fun_facts)
-    bot.reply_to(message, fact)
+    fact = random.choice(fun_facts)  # Select a random fun fact
+    bot.reply_to(message, f"🧐 Fun Fact: {fact}")
 
 def start_guess_game(message):
     number = random.randint(1, 10)
