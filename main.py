@@ -3,7 +3,14 @@ import random
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from keep_alive import keep_alive  # Import the keep_alive function
+import time
 
+while True:
+    try:
+        bot.polling()
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        time.sleep(15)  # Wait for a while before reconnecting
 # Keep the bot alive
 keep_alive()
 
@@ -769,7 +776,11 @@ def check_math_answer(message, correct_answer):
         bot.reply_to(message, "Please enter a valid number.")
 
 # Run the bot
-try:
-    bot.polling(none_stop=True)
-except Exception as e:
-    print(f"Error occurred: {e}")
+import time
+
+while True:
+    try:
+        bot.polling(none_stop=True)  # Keeps polling for new messages
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        time.sleep(15)  # Wait 15 seconds before restarting the bot
